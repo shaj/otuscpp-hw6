@@ -33,7 +33,7 @@ target_link_libraries(test_matrix
 
 
 configure_file("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/version.h")
-target_include_directories(print_ip PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories(matrix PUBLIC "${PROJECT_BINARY_DIR}")
 
 
 install(TARGETS matrix RUNTIME DESTINATION bin)
