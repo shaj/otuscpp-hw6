@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.2)
 project(matrix VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS log REQUIRED)
+find_package(Boost COMPONENTS program_options REQUIRED)
+find_package(Threads)
 
 add_executable(matrix main.cpp)
 
@@ -18,6 +21,11 @@ set_target_properties(matrix test_matrix PROPERTIES
 
 target_link_libraries(matrix
   ${Boost_LIBRARIES}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_LOG_LIBRARY}
+  ${Boost_LOG_SETUP_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${CMAKE_THREAD_LIBS_INIT}
 )
 
 set_target_properties(test_matrix PROPERTIES

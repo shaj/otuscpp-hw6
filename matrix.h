@@ -19,6 +19,7 @@
 #include <iterator>
 #include <map>
 
+#include <boost/log/trivial.hpp>
 
 namespace my
 {
@@ -28,67 +29,115 @@ class matrix
 {
 private:	
 
-	template<typename U>
-	class item
+	template<class tabletype>
+	class item_adapter
 	{
-	std::map<int, U> m;
-	int wrk_idx;
-	public:
-		item(){};
+	private:	
 
-		item<U> & operator=(U &val)
+		using item = typename tabletype::item;
+		using value_type = typename tabletype::value_type;
+
+		tabletype *table;
+		std::size_t row_idx;
+
+		item_adapter(){};
+
+	public:
+
+		item_adapter(tabletype *tbl, std::size_t r)
+			:table(tbl), row_idx(r) {}
+
+		item& operator=(const value_type &val)
 		{
-			if(val == DEF_VAL)
-			{
-				// typename std::map<int, T>::iterator it;
-				// it = m.find(idx);
-				// if(it != m.end())
-				// {
-				// 	return m[idx];
-				// }
-				// return def_val;
-				m[0] = val;
-			}
+			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+			table->set(row_idx, val);
 			return *this;
 		}
 
-		U& operator[](int idx)
+		// U& operator[](int idx)
+		// {
+		// 	return m[0];
+		// }
+
+		operator const value_type&() const
 		{
-			return m[0];
+			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+			return table->get(row_idx);
 		}
 
-
-		std::size_t size()
-		{
-			return m.size();
-		}
-
-		void set_idx(int idx)
-		{
-			wrk_idx = idx;
-		}
+		// void set_idx(int idx)
+		// {
+		// 	row_idx = idx;
+		// }
 	};
 
 
-	item<T> it;
+
+	std::map<int, T> m;
+
 
 public:
 	
-	matrix()
-	{}
+	using item = item_adapter<matrix<T, DEF_VAL, N>>;
+	using value_type = T;
 
-
-	
-
-	item<T>& operator[](int idx)
+	// This gives us the "default" value to return for an empty bucket.
+	// We just use the default constructor on T, the template type
+	const T&  default_value() const
 	{
-		it.set_idx(idx);
-		return &it;
+		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+
+		static value_type defaultval = value_type(DEF_VAL);
+		return defaultval;
+	}
+
+	matrix(){}
+
+	item operator[](int idx) 
+	{
+		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+		return item(this, idx);
 	}
 
 	std::size_t size()
 	{
-		return it.size();
+		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+		return m.size();
+	}
+
+	const T& get(int idx) const
+	{
+		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+		auto it = m.find(idx);
+		if(it != m.end())
+		{
+			return it->second;
+		}
+		return default_value();
+	}
+
+	void set(int idx, const T &val)
+	{
+		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+				
+		if(val == DEF_VAL)
+		{ // Удалить значение из списка
+			auto it = m.find(idx);
+			if(it != m.end())
+			{
+				m.erase(idx);
+			}
+		}
+		else
+		{ // Заменить (создать) значение в списке
+			m[idx] = val;
+		}
+		return;
 	}
 
 };
