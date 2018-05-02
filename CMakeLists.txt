@@ -37,6 +37,11 @@ set_target_properties(test_matrix PROPERTIES
 target_link_libraries(test_matrix
   ${Boost_UNIT_TEST_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_LOG_LIBRARY}
+  ${Boost_LOG_SETUP_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${CMAKE_THREAD_LIBS_INIT}
 )
 
 
