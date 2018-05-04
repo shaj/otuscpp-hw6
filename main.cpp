@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include "version.h"
 #include "matrix.h"
 
 
@@ -52,9 +53,9 @@ int main (int argc, char* argv[])
 
 		po::options_description descr("Allowed options");
 		descr.add_options()
-			("help,h", "produce help message")
-			("version,v", "version")
-			("debug,d", "enable loggigng")
+			("help,h", "Produce help message")
+			("version,v", "Version")
+			("debug,d", "Enable loggigng")
 		;
 
 		po::variables_map vm;
@@ -69,7 +70,9 @@ int main (int argc, char* argv[])
 
 		if(vm.count("version"))
 		{
-			std::cout << "version()" << std::endl;
+			std::cout << "OTUS cpp" << std::endl;
+			std::cout << "Homework 6. Sparse matrix." << std::endl;
+			std::cout << "Version " << VER << std::endl << std::endl;
 			return 0;
 		}
 
@@ -86,8 +89,8 @@ int main (int argc, char* argv[])
 		my::matrix<int, 0> m;
 		for(int i=0; i<10; i++)
 		{
-			m[i][i] = 9 - i;
-			m[i][9-i] = 9 - i;
+			m[i][i] = i;
+			m[i][9-i] = i;
 		}
 
 		for(int i=1; i<9; i++)
@@ -99,14 +102,6 @@ int main (int argc, char* argv[])
 			std::cout << std::endl;
 		}
 
-		for(auto it: m)
-		{
-			std::size_t x;
-			std::size_t y;
-			int v;
-			std::tie(x, y, v) = it.foo();
-			std::cout << x << y << v << std::endl;
-		}
 
 		BOOST_LOG_TRIVIAL(info) << "End matrix test";
 	}

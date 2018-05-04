@@ -10,6 +10,7 @@
 #include <iterator>
 #include <map>
 
+#include <stdexcept>
 #include <boost/log/trivial.hpp>
 
 namespace my
@@ -20,6 +21,10 @@ class matrix
 {
 private:	
 
+	/**
+	 * Класс адаптера позволяет получить доступ 
+	 * к элементам матрицы через оператор издекса [][]
+	 */
 	template<class tabletype>
 	class item_adapter
 	{
@@ -56,6 +61,8 @@ private:
 		{
 			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 
+			if(idx >= N) throw std::out_of_range("y");
+	
 			cell_idx.second = idx;
 			return *this;
 		}
@@ -79,8 +86,6 @@ public:
 	using value_type = T;
 	using cell_idx_type = typename std::pair<std::size_t, std::size_t>;
 	using container_type = typename std::map<cell_idx_type, T>;
-	using iterator_type = typename container_type::iterator;
-	using const_iterator_type = typename container_type::const_iterator;
 
 
 	std::map<cell_idx_type, T> m;
@@ -88,43 +93,46 @@ public:
 	typedef decltype(m.begin()) iter_type;
 	typedef decltype(m.cbegin()) const_iter_type;
 
-
-    // class Iterator: public std::iterator<
-    //                     std::input_iterator_tag,   // iterator_category
-    //                     T,                      // value_type
-    //                     T,                      // difference_type
-    //                     const T*,               // pointer
-    //                     T                       // reference
-    //                                   >
-
 	class Iterator
 	{
-        const_iter_type iter;
-    public:
-        Iterator(const_iter_type const &it) : iter(it) {}
+		const_iter_type iter;
 
-        Iterator& operator++() 
-        {
-        	iter++;
-        	return *this;
-        }
+		template<typename U>
+		struct itAdaptor
+		{
+			std::size_t x;
+			std::size_t y;
+			U v;
 
-        bool operator==(Iterator other) const {return iter == other.iter;}
-        bool operator!=(Iterator other) const {return !(*this == other);}
-        const Iterator& operator*() const {return *this;}
 
-        // operator const T&() const {return iter->second;}
+			itAdaptor(std::size_t _x, std::size_t _y, U const &_v) :
+					x(_x), y(_y), v(_v)
+			{}
 
-        // std::tuple<std::size_t, std::size_t, T> operator*()
-        // {
-        // 	return std::make_tuple(iter->first.first, iter->first.second, iter->second);
-        // }
+			std::tuple<std::size_t, std::size_t, U> operator*()
+			{
+				return std::make_tuple(x, y, v);
+			}
+		};
 
-        std::tuple<std::size_t, std::size_t, T> foo()
-        {
-        	return std::make_tuple(iter->first.first, iter->first.second, iter->second);
-        }
-    };
+	public:
+		Iterator(const_iter_type const &it) : iter(it) {}
+
+		Iterator& operator++() 
+		{
+			iter++;
+			return *this;
+		}
+
+		bool operator==(Iterator other) const {return iter == other.iter;}
+		bool operator!=(Iterator other) const {return !(*this == other);}
+		const itAdaptor<T> operator*() const 
+		{
+			BOOST_LOG_TRIVIAL(trace) << __PRETTY_FUNCTION__;
+			return itAdaptor<T>(iter->first.first, iter->first.second, iter->second);
+		}
+
+	};
 
 
 public:
@@ -153,6 +161,8 @@ public:
 	item operator[](int idx) 
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
+
+		if(idx >= N) throw std::out_of_range("x");
 				
 		return item(this, idx);
 	}
@@ -167,7 +177,9 @@ public:
 	const T& get(const cell_idx_type &idx) const
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
-				
+		
+		if((idx.first >= N) || (idx.first >= N)) throw std::out_of_range("x or y");
+
 		auto it = m.find(idx);
 		if(it != m.end())
 		{
@@ -180,6 +192,8 @@ public:
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
+		if((idx.first >= N) || (idx.first >= N)) throw std::out_of_range("x or y");
+
 		if(val == DEF_VAL)
 		{ // Удалить значение из списка
 			auto it = m.find(idx);
