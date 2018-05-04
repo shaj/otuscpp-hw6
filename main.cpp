@@ -103,6 +103,19 @@ int main (int argc, char* argv[])
 		}
 
 
+		std::cout << std:: endl << "Number of occupied cells: " << m.size() << std::endl;
+
+		std::cout << std::endl << "List of occupied cells:" << std::endl;
+		for(auto it: m)
+		{
+			std::size_t x;
+			std::size_t y;
+			int v;
+			std::tie(x, y, v) = *it;
+			std::cout << "m[" << x << "][" << y << "] = " << v << std::endl;
+		}
+
+
 		BOOST_LOG_TRIVIAL(info) << "End matrix test";
 	}
 	catch(const std::exception &e)
