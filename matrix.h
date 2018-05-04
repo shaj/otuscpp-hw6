@@ -1,15 +1,6 @@
 /**
  * \file
- * Реализация функции печати условного ip адреса
- */
-
-
-/**
- * \brief решение поставленной задачи
- *
- * \todo
- *  - по возможности использовать stl (type_is, enable_if ...)
- *  - реализовать печать tuple чисел
+ * Реализация разреженной матрицы
  */
 
 
@@ -23,7 +14,7 @@
 
 namespace my
 {
-
+/// Класс разреженной матрицы
 template<typename T, T DEF_VAL, std::size_t N = std::numeric_limits<typename std::size_t>::max()>
 class matrix
 {
@@ -76,18 +67,13 @@ private:
 			return table->get(cell_idx);
 		}
 
-		// void set_idx(int idx)
-		// {
-		// 	row_idx = idx;
-		// }
 	};
 
 public: 
 
-	template<class tabletype>
 	class Iterator;
 
-	using iterator = Iterator<T>;
+	using iterator = Iterator;
 
 	using item = item_adapter<matrix<T, DEF_VAL, N>>;
 	using value_type = T;
@@ -96,67 +82,53 @@ public:
 	using iterator_type = typename container_type::iterator;
 	using const_iterator_type = typename container_type::const_iterator;
 
-	template<class tabletype>
-	class Iterator
-	{
-	private:
-
-		using itertype = typename tabletype::const_iterator_type;
-
-		tabletype *table;
-		itertype iter;
-
-		Iterator(){}
-
-	public:
-
-		using value_type = T;
-		using pointer = T*;
-		using const_pointer = const T*;
-		using reference = T&;
-		using const_reference = const T&;
-
-		Iterator(tabletype *tbl, itertype itr) : table(tbl), iter(itr)
-		{
-
-		}
-
-		// Проверка на равенство
-		bool operator==( const Iterator& other ) const 
-		{
-			if( this == &other ) 
-			{
-				return true;
-			}
-			return iter == other.iter;
-		}
-
-		// Проверка на неравенство
-		bool operator!=( const Iterator& other ) const 
-		{
-			return !operator==( other );
-		}
-
-		// Получение значения текущего узла
-		T operator*() const 
-		{
-			return *iter;
-		}
-
-		// Переход к следующему узлу
-		void operator++() 
-		{
-			iter++;
-		}
-
-	};
-
-private: 
 
 	std::map<cell_idx_type, T> m;
 
+	typedef decltype(m.begin()) iter_type;
+	typedef decltype(m.cbegin()) const_iter_type;
+
+
+    // class Iterator: public std::iterator<
+    //                     std::input_iterator_tag,   // iterator_category
+    //                     T,                      // value_type
+    //                     T,                      // difference_type
+    //                     const T*,               // pointer
+    //                     T                       // reference
+    //                                   >
+
+	class Iterator
+	{
+        const_iter_type iter;
+    public:
+        Iterator(const_iter_type const &it) : iter(it) {}
+
+        Iterator& operator++() 
+        {
+        	iter++;
+        	return *this;
+        }
+
+        bool operator==(Iterator other) const {return iter == other.iter;}
+        bool operator!=(Iterator other) const {return !(*this == other);}
+        const Iterator& operator*() const {return *this;}
+
+        // operator const T&() const {return iter->second;}
+
+        // std::tuple<std::size_t, std::size_t, T> operator*()
+        // {
+        // 	return std::make_tuple(iter->first.first, iter->first.second, iter->second);
+        // }
+
+        std::tuple<std::size_t, std::size_t, T> foo()
+        {
+        	return std::make_tuple(iter->first.first, iter->first.second, iter->second);
+        }
+    };
+
 
 public:
+
 
 	/**
 	 * This gives us the "default" value to return for an empty bucket.
@@ -173,7 +145,10 @@ public:
 
 
 
-	matrix(){}
+	matrix()
+	{
+		BOOST_LOG_TRIVIAL(trace) << __PRETTY_FUNCTION__;
+	}
 
 	item operator[](int idx) 
 	{
@@ -220,20 +195,18 @@ public:
 		return;
 	}
 
-	/// Получить итератор на начало списка
-	Iterator<T> begin() const
+
+	Iterator begin() const
 	{
-		// Итератор пойдет от головного элемента...
-		return Iterator<T>( this, m.begin() );
+		auto a = m.begin();
+		return Iterator(a);
 	}
 
-	/// Получить итератор на конец списка
-	Iterator<T> end() const
+	Iterator end() const 
 	{
-		return Iterator<T>( this, m.end() );
+		auto a = m.end();
+		return Iterator(a);
 	}
-
-
 
 };
 

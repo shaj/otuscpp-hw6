@@ -29,7 +29,6 @@ namespace keywords = boost::log::keywords;
  * \brief main
  *
  * Программа проверкаи работы 2-мерной бесконечной матрицы
- * \return всегда 0
  */
 int main (int argc, char* argv[])
 {
@@ -100,31 +99,16 @@ int main (int argc, char* argv[])
 			std::cout << std::endl;
 		}
 
-
 		for(auto it: m)
 		{
-			int x, y, z;
-			std::tie(x, y, v) = *it;
+			std::size_t x;
+			std::size_t y;
+			int v;
+			std::tie(x, y, v) = it.foo();
 			std::cout << x << y << v << std::endl;
 		}
 
 		BOOST_LOG_TRIVIAL(info) << "End matrix test";
-		// my::matrix<int, -10> m;
-
-		// std::cout << "size = " << m.size() << std::endl;
-		// // std::cout << m[1] << " - " << m[100000] << std::endl;
-		// m[1] = 10;
-		// std::cout << "size = " << m.size() << std::endl;
-
-		// int a = m[1];
-		// int b = m[2];
-		// m[3] = 5;
-		// m[4] = 500;
-		// std::cout << "a = " << a << "; b = " << b << std::endl;
-		// std::cout << "size = " << m.size() << std::endl;
-		// std::cout << "m[1] " << m[1] << std::endl;
-		// m[3] = -10;
-		// std::cout << "size = " << m.size() << std::endl;
 	}
 	catch(const std::exception &e)
 	{

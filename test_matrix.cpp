@@ -35,15 +35,21 @@ BOOST_AUTO_TEST_CASE(test_matrix)
 	BOOST_CHECK(m[100][100] == 217);
 
 	
+	// for(auto it: m)
+	// {
+	// 	std::cout << *it << std::endl;
+
+	// }
+
 
 	std::stringbuf out_buffer;
 	std::ostream out_stream(&out_buffer);
 	for(auto it: m)
 	{
-		int x;
-		int y;
+		std::size_t x;
+		std::size_t y;
 		int v;
-		std::tie(x, y, v) = *it;
+		std::tie(x, y, v) = it.foo();
 		out_stream << x << y << v << std::endl;
 	}
 	BOOST_CHECK(out_buffer.str() == "100100217\n");
