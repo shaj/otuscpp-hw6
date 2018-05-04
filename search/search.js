@@ -7,14 +7,14 @@
 
 var indexSectionsWithContent =
 {
-  0: "bcdefgimoprstv",
+  0: "bcdegimoprstv",
   1: "im",
   2: "m",
   3: "mrtv",
-  4: "bdefgimos",
+  4: "bdegimos",
   5: "cim",
   6: "civ",
-  7: "bp",
+  7: "bpv",
   8: "m"
 };
 
