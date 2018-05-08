@@ -16,7 +16,7 @@
 namespace my
 {
 /// Класс разреженной матрицы
-template<typename T, T DEF_VAL, std::size_t N = std::numeric_limits<typename std::size_t>::max()>
+template<typename T, T DEF_VAL>
 class matrix
 {
 private:	
@@ -61,8 +61,6 @@ private:
 		{
 			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 
-			if(idx >= N) throw std::out_of_range("y");
-	
 			cell_idx.second = idx;
 			return *this;
 		}
@@ -76,64 +74,8 @@ private:
 
 	};
 
-public: 
 
-	class Iterator;
-
-	using iterator = Iterator;
-
-	using item = item_adapter<matrix<T, DEF_VAL, N>>;
-	using value_type = T;
-	using cell_idx_type = typename std::pair<std::size_t, std::size_t>;
-	using container_type = typename std::map<cell_idx_type, T>;
-
-
-	std::map<cell_idx_type, T> m;
-
-	typedef decltype(m.begin()) iter_type;
-	typedef decltype(m.cbegin()) const_iter_type;
-
-	class Iterator
-	{
-		const_iter_type iter;
-
-		template<typename U>
-		struct itAdaptor
-		{
-			std::size_t x;
-			std::size_t y;
-			U v;
-
-
-			itAdaptor(std::size_t _x, std::size_t _y, U const &_v) :
-					x(_x), y(_y), v(_v)
-			{}
-
-			std::tuple<std::size_t, std::size_t, U> operator*()
-			{
-				return std::make_tuple(x, y, v);
-			}
-		};
-
-	public:
-		Iterator(const_iter_type const &it) : iter(it) {}
-
-		Iterator& operator++() 
-		{
-			iter++;
-			return *this;
-		}
-
-		bool operator==(Iterator other) const {return iter == other.iter;}
-		bool operator!=(Iterator other) const {return !(*this == other);}
-		const itAdaptor<T> operator*() const 
-		{
-			BOOST_LOG_TRIVIAL(trace) << __PRETTY_FUNCTION__;
-			return itAdaptor<T>(iter->first.first, iter->first.second, iter->second);
-		}
-
-	};
-
+	std::list<std::tuple<std::size_t, std::size_t, T>> m;
 
 public:
 
@@ -162,8 +104,6 @@ public:
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 
-		if(idx >= N) throw std::out_of_range("x");
-				
 		return item(this, idx);
 	}
 
@@ -174,37 +114,45 @@ public:
 		return m.size();
 	}
 
-	const T& get(const cell_idx_type &idx) const
+	const T& get(std::size_t r, std::size_t c) const
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 		
-		if((idx.first >= N) || (idx.first >= N)) throw std::out_of_range("x or y");
-
-		auto it = m.find(idx);
+		auto it = std::find_if(m.begin(), m.end(), 
+			[](auto it)
+			{
+				return ((std::get<0>(it) == r) && (std::get<1>(it) == c))
+			});
 		if(it != m.end())
 		{
-			return it->second;
+			return std::get<2>(it);
 		}
 		return default_value();
 	}
 
-	void set(const cell_idx_type &idx, const T &val)
+	void set(std::size_t r, std::size_t c, const T &val)
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
-		if((idx.first >= N) || (idx.first >= N)) throw std::out_of_range("x or y");
-
-		if(val == DEF_VAL)
-		{ // Удалить значение из списка
-			auto it = m.find(idx);
-			if(it != m.end())
+		auto it = std::find_if(m.begin(), m.end(), 
+			[](auto it)
 			{
+				return ((std::get<0>(it) == r) && (std::get<1>(it) == c))
+			});
+		if(it != m.end())
+		{
+			if(val == DEF_VAL)
+			{ // Удалить значение из списка
 				m.erase(idx);
+			}
+			else
+			{ // Заменить (создать) значение в списке
+				m[idx] = val;
 			}
 		}
 		else
-		{ // Заменить (создать) значение в списке
-			m[idx] = val;
+		{
+
 		}
 		return;
 	}

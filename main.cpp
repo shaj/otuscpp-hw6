@@ -111,7 +111,7 @@ int main (int argc, char* argv[])
 			std::size_t x;
 			std::size_t y;
 			int v;
-			std::tie(x, y, v) = *it;
+			std::tie(x, y, v) = it;
 			std::cout << "m[" << x << "][" << y << "] = " << v << std::endl;
 		}
 
