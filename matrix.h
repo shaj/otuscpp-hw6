@@ -8,6 +8,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <list>
 #include <map>
 
 #include <stdexcept>
@@ -77,6 +78,8 @@ private:
 
 	std::list<std::tuple<std::size_t, std::size_t, T>> m;
 
+
+
 public:
 
 
@@ -139,20 +142,24 @@ public:
 			{
 				return ((std::get<0>(it) == r) && (std::get<1>(it) == c))
 			});
+
 		if(it != m.end())
 		{
-			if(val == DEF_VAL)
-			{ // Удалить значение из списка
-				m.erase(idx);
-			}
-			else
-			{ // Заменить (создать) значение в списке
-				m[idx] = val;
+			if(val != std::get<3>(it))
+			{
+				m.erase(it);
+				if(val != DEF_VAL)
+				{ 
+					m.push_back(std::make_tuple(r, c, val))
+				}
 			}
 		}
 		else
 		{
-
+			if(val != DEF_VAL)
+			{ 
+				m.emplace(std::make_tuple(r, c, val))
+			}
 		}
 		return;
 	}
@@ -160,14 +167,12 @@ public:
 
 	Iterator begin() const
 	{
-		auto a = m.begin();
-		return Iterator(a);
+		return m.begin();
 	}
 
 	Iterator end() const 
 	{
-		auto a = m.end();
-		return Iterator(a);
+		return m.end();
 	}
 
 };
