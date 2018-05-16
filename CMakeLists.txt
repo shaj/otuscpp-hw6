@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(matrix VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+
+set(PATCH_VERSION 0)
+if($ENV{TRAVIS_BUILD_NUMBER})
+  set(PATCH_VERSION $ENV{TRAVIS_BUILD_NUMBER})
+endif()
+
+
+project(matrix VERSION 0.0.${PATCH_VERSION})
 
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 find_package(Boost COMPONENTS log REQUIRED)
@@ -17,6 +24,7 @@ set_target_properties(matrix test_matrix PROPERTIES
   CXX_STANDARD_REQUIRED ON
   COMPILE_DEFINITIONS BOOST_LOG_DYN_LINK
   COMPILE_OPTIONS -Wpedantic -Wall -Wextra
+  INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
 target_link_libraries(matrix
@@ -28,10 +36,10 @@ target_link_libraries(matrix
   ${CMAKE_THREAD_LIBS_INIT}
 )
 
-set_target_properties(test_matrix PROPERTIES
-  COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-  INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
-)
+#set_target_properties(test_matrix PROPERTIES
+#  COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+#  INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+#)
 
 
 target_link_libraries(test_matrix
@@ -43,11 +51,6 @@ target_link_libraries(test_matrix
   ${Boost_THREAD_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
 )
-
-
-configure_file("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/version.h")
-target_include_directories(matrix PUBLIC "${PROJECT_BINARY_DIR}")
-
 
 install(TARGETS matrix RUNTIME DESTINATION bin)
 
@@ -64,3 +67,9 @@ include (CPack)
 enable_testing()
 
 add_test(test_matrix test_matrix)
+
+
+configure_file("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/version.h" @ONLY)
+target_include_directories(matrix PUBLIC "${PROJECT_BINARY_DIR}")
+
+configure_file("${PROJECT_SOURCE_DIR}/bintray.json.in" "${PROJECT_BINARY_DIR}/bintray.json")

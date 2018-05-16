@@ -3,6 +3,8 @@
  * Реализация разреженной матрицы
  */
 
+#pragma once
+
 
 #include <iostream>
 #include <sstream>
@@ -33,7 +35,7 @@ private:
 
 		using item = typename tabletype::item;
 		using value_type = typename tabletype::value_type;
-		using cellidx_t = typename tabletype::cell_idx_type;
+		using cellidx_t = typename std::pair<std::size_t, std::size_t>;
 
 		tabletype *table;
 		std::size_t row_idx;
@@ -54,7 +56,7 @@ private:
 		{
 			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
-			table->set(cell_idx, val);
+			table->set(cell_idx.first, cell_idx.second, val);
 			return *this;
 		}
 
@@ -70,14 +72,39 @@ private:
 		{
 			BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
-			return table->get(cell_idx);
+			return table->get(cell_idx.first, cell_idx.second);
 		}
 
 	};
 
 
-	std::list<std::tuple<std::size_t, std::size_t, T>> m;
+    using value_type = T;
+    using reference = T&;
+    using pointer = T*;
 
+	/// Тип контейнера ячеек
+	using cells_list_t = typename std::list<std::tuple<std::size_t, std::size_t, T&>>;
+	/// Итератор по всем ячейкам
+	using iterator = typename cells_list_t::iterator;
+	/// Константный итератор по всем ячейкам
+	using const_iterator = typename cells_list_t::const_iterator;
+
+	using item = item_adapter<matrix<T, DEF_VAL>>;
+
+
+
+	// void remove_cell(const_iterator &it);
+	// const_iterator get_cell(std::size_t r, std::size_t c);
+
+	/**
+	 * Контейнер для хранения занятых координат
+	 */
+	cells_list_t cells;
+
+	/**
+	 * Контейнер для хранения объектов ячеек
+	 */
+	std::list<T> values;
 
 
 public:
@@ -91,7 +118,7 @@ public:
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 
-		static value_type defaultval = value_type(DEF_VAL);
+		static T defaultval = T(DEF_VAL);
 		return defaultval;
 	}
 
@@ -114,21 +141,17 @@ public:
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
-		return m.size();
+		return cells.size();
 	}
 
 	const T& get(std::size_t r, std::size_t c) const
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 		
-		auto it = std::find_if(m.begin(), m.end(), 
-			[](auto it)
-			{
-				return ((std::get<0>(it) == r) && (std::get<1>(it) == c))
-			});
-		if(it != m.end())
+		const auto it = get_cell(r, c);
+		if(it != cells.end())
 		{
-			return std::get<2>(it);
+			return std::get<2>(*it);
 		}
 		return default_value();
 	}
@@ -137,43 +160,63 @@ public:
 	{
 		BOOST_LOG_TRIVIAL(info) << __PRETTY_FUNCTION__;
 				
-		auto it = std::find_if(m.begin(), m.end(), 
-			[](auto it)
-			{
-				return ((std::get<0>(it) == r) && (std::get<1>(it) == c))
-			});
+		const auto it = get_cell(r, c);
 
-		if(it != m.end())
-		{
-			if(val != std::get<3>(it))
+		if(it != cells.end())
+		{ // ячейка уже содержит значение
+			if(val != std::get<2>(*it))
 			{
-				m.erase(it);
-				if(val != DEF_VAL)
-				{ 
-					m.push_back(std::make_tuple(r, c, val))
+				if(val == DEF_VAL)
+				{
+					remove_cell(it);
 				}
-			}
+				else
+				{
+					std::get<2>(*it) = val;
+				}
+			} // 
 		}
 		else
-		{
+		{ // Такой ячейки еще не существует. (В ячейке значение по умолчанию)
 			if(val != DEF_VAL)
 			{ 
-				m.emplace(std::make_tuple(r, c, val))
+				values.push_back(val);
+				cells.push_back(std::make_tuple(r, c, std::ref(*(--values.end()))));
+
+				BOOST_LOG_TRIVIAL(debug) << "  ~ set value " << val << "  " << std::get<2>(*(--cells.end()));
 			}
 		}
 		return;
 	}
 
 
-	Iterator begin() const
+	const_iterator begin() const
 	{
-		return m.begin();
+		return cells.begin();
 	}
 
-	Iterator end() const 
+	const_iterator end() const 
 	{
-		return m.end();
+		return cells.end();
 	}
+
+
+private:
+	void remove_cell(const const_iterator &it)
+	{
+		// values.remove_if([](const T &it){})
+		cells.erase(it);
+	}		
+
+	const_iterator get_cell(std::size_t r, std::size_t c) const
+	{
+		return std::find_if(cells.begin(), cells.end(), 
+			[r, c](auto it)
+			{
+				return ((std::get<0>(it) == r) && (std::get<1>(it) == c));
+			});
+	}
+
 
 };
 
