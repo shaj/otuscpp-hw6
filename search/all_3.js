@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['end',['end',['../classmy_1_1matrix.html#acff844e0f38579c2f3524c7a48e0a641',1,'my::matrix']]]
+  ['get',['get',['../classmy_1_1matrix.html#ad0bf1044dd4a19a8b9017db1bf97f8c1',1,'my::matrix']]]
 ];

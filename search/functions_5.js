@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
-  ['matrix',['matrix',['../classmy_1_1matrix.html#a042185ad485ab285eaff459c59654ed2',1,'my::matrix']]]
+  ['operator_5b_5d',['operator[]',['../classmy_1_1matrix.html#a94d3131978431e9e0f7a505a15dd4634',1,'my::matrix']]]
 ];

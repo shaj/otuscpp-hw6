@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['project_5fversion_5fmajor',['PROJECT_VERSION_MAJOR',['../version_8h.html#abecd2198575b690d25a741857f8390d1',1,'version.h']]],
-  ['project_5fversion_5fminor',['PROJECT_VERSION_MINOR',['../version_8h.html#a43e23009192a3e216fefec17750d8673',1,'version.h']]],
-  ['project_5fversion_5fpatch',['PROJECT_VERSION_PATCH',['../version_8h.html#a4a5fc96a4bdd7d68ed99ccce9ca2e77e',1,'version.h']]]
+  ['set',['set',['../classmy_1_1matrix.html#ab068f28a38cb3fce9ff3e7ecb2ca8d57',1,'my::matrix']]],
+  ['size',['size',['../classmy_1_1matrix.html#abfb3fef32af6931c6f4b51185015ecc8',1,'my::matrix']]]
 ];

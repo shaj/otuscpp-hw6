@@ -7,15 +7,13 @@
 
 var indexSectionsWithContent =
 {
-  0: "bcdegimoprstv",
-  1: "im",
+  0: "bdegmoprstv",
+  1: "m",
   2: "m",
   3: "mrtv",
-  4: "bdegimos",
-  5: "cim",
-  6: "civ",
-  7: "bpv",
-  8: "m"
+  4: "bdegmos",
+  5: "bpv",
+  6: "m"
 };
 
 var indexSectionNames =
@@ -25,10 +23,8 @@ var indexSectionNames =
   2: "namespaces",
   3: "files",
   4: "functions",
-  5: "variables",
-  6: "typedefs",
-  7: "defines",
-  8: "pages"
+  5: "defines",
+  6: "pages"
 };
 
 function convertToId(search)
