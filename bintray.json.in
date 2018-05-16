@@ -10,7 +10,7 @@
 
     "version": {
         "name": "@CPACK_PACKAGE_VERSION@",
-        "desc": "",
+        "desc": "Homework 6. Sparse matrix.",
         "gpgSign": false
     },
 
